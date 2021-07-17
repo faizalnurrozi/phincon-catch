@@ -19,6 +19,35 @@ func NewPokemonHandler(handler handlers.Handler) handlers2.IPokemonHandler {
 }
 
 // function handler for add data by payload
+func (handler PokemonHandler) Catch(ctx *fiber.Ctx) (err error) {
+
+	// Parse & Checking input
+	input := new(request.PokemonCatchRequest)
+	if err := ctx.BodyParser(input); err != nil {
+		return handler.SendResponse(ctx, handlers.ResponseWithOutMeta, nil, nil, err, http.StatusUnprocessableEntity)
+	}
+	if err := handler.Validate.Struct(input); err != nil {
+		return handler.SendResponse(ctx, handlers.ResponseWithOutMeta, nil, nil, err, http.StatusBadRequest)
+	}
+
+	// Database processing
+	handler.UcContract.TX, err = handler.DB.Begin()
+	if err != nil {
+		handler.UcContract.TX.Rollback()
+		return handler.SendResponse(ctx, handlers.ResponseWithOutMeta, nil, nil, err, http.StatusUnprocessableEntity)
+	}
+	uc := v1.NewPokemonUseCase(handler.UcContract)
+	res, err := uc.Catch(input)
+	if err != nil {
+		handler.UcContract.TX.Rollback()
+		return handler.SendResponse(ctx, handlers.ResponseWithOutMeta, nil, nil, err, http.StatusUnprocessableEntity)
+	}
+	handler.UcContract.TX.Commit()
+
+	return handler.SendResponse(ctx, handlers.ResponseWithOutMeta, res, nil, err, http.StatusUnprocessableEntity)
+}
+
+// function handler for add data by payload
 func (handler PokemonHandler) Add(ctx *fiber.Ctx) (err error) {
 
 	// Parse & Checking input

@@ -5,11 +5,13 @@ import (
 	"github.com/faizalnurrozi/phincon-catch/domain/models"
 	"github.com/faizalnurrozi/phincon-catch/domain/request"
 	"github.com/faizalnurrozi/phincon-catch/domain/usecases"
+	"github.com/faizalnurrozi/phincon-catch/domain/view_models"
 	"github.com/faizalnurrozi/phincon-catch/packages/functioncaller"
 	"github.com/faizalnurrozi/phincon-catch/packages/logruslogger"
 	"github.com/faizalnurrozi/phincon-catch/repositories/v1/command"
 	"github.com/faizalnurrozi/phincon-catch/repositories/v1/query"
 	"github.com/faizalnurrozi/phincon-catch/usecase"
+	"math/rand"
 	"time"
 )
 
@@ -19,6 +21,20 @@ type PokemonUseCase struct {
 
 func NewPokemonUseCase(ucContract *usecase.Contract) usecases.IPokemonUseCase {
 	return &PokemonUseCase{Contract: ucContract}
+}
+
+func (uc PokemonUseCase) randomProbability() bool {
+	return rand.Float32() < 0.5
+}
+
+// Catch data by 0.5 probability
+func (uc PokemonUseCase) Catch(req *request.PokemonCatchRequest) (res view_models.PokemonCatch, err error) {
+	res = view_models.PokemonCatch{
+		PokemonID: req.PokemonID,
+		Status:    uc.randomProbability(),
+	}
+
+	return res, err
 }
 
 // Add data by request

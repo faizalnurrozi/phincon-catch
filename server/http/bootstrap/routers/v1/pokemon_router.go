@@ -21,6 +21,7 @@ func (route PokemonRoute) RegisterRoute() {
 	// List of route
 	pokemonGroupRouters := route.RouteGroup.Group("/pokemon")
 	pokemonGroupRouters.Use(basicAuthMiddleware.BasicAuthNew())
+	pokemonGroupRouters.Post("/catch", handler.Catch)
 	pokemonGroupRouters.Post("", handler.Add)
 	pokemonGroupRouters.Put("/:id", handler.Edit)
 	pokemonGroupRouters.Delete("/:id", handler.DeleteBy)
