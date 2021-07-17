@@ -3,6 +3,6 @@
 ## How to run
 
 ```
-$ cd /<user-path>/github.com/faizalnurrozi/phincon-browse/server/http
+$ cd /<user-path>/github.com/faizalnurrozi/phincon-catch/server/http
 $ go run main.go
 ```
