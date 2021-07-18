@@ -18,6 +18,20 @@ func NewPokemonHandler(handler handlers.Handler) handlers2.IPokemonHandler {
 	return &PokemonHandler{Handler: handler}
 }
 
+// function handler for browse all data
+func (handler PokemonHandler) Browse(ctx *fiber.Ctx) error {
+	search := ctx.Query("search")
+	orderBy := ctx.Query("order_by")
+	sort := ctx.Query("sort")
+	limit, _ := strconv.Atoi(ctx.Query("limit"))
+	page, _ := strconv.Atoi(ctx.Query("page"))
+
+	uc := v1.NewPokemonUseCase(handler.UcContract)
+	res, pagination, err := uc.Browse(search, orderBy, sort, page, limit)
+
+	return handler.SendResponse(ctx, handlers.ResponseWithMeta, res, pagination, err, http.StatusUnprocessableEntity)
+}
+
 // function handler for add data by payload
 func (handler PokemonHandler) Catch(ctx *fiber.Ctx) (err error) {
 

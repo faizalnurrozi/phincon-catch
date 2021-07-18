@@ -17,6 +17,25 @@ func NewPokemonRepository(DB *sql.DB) query.IPokemonRepository {
 	return &PokemonRepository{DB: DB}
 }
 
+func (repository PokemonRepository) Browse(search, orderBy, sort string, limit, offset int) (res []*models.Pokemon, err error) {
+	statement := models.NewPokemon().GetSelect() + ` ` + models.NewPokemon().GetWhere() + ` ORDER BY ` + orderBy + ` ` + sort + ` LIMIT ?,?`
+	rows, err := repository.DB.Query(statement, "%"+strings.ToLower(search)+"%", offset, limit)
+	if err != nil {
+		return res, err
+	}
+
+	for rows.Next() {
+		model := models.NewPokemon()
+		err = model.ScanRows(rows)
+		if err != nil {
+			return res, err
+		}
+		res = append(res, model)
+	}
+
+	return res, nil
+}
+
 // Count Get count data from table
 func (repository PokemonRepository) Count(search string) (res int, err error) {
 	model := models.NewPokemon()

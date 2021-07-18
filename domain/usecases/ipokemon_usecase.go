@@ -6,6 +6,8 @@ import (
 )
 
 type IPokemonUseCase interface {
+	Browse(search, orderBy, sort string, page, limit int) (res []view_models.PokemonVM, pagination view_models.PaginationVm, err error)
+
 	Catch(req *request.PokemonCatchRequest) (res view_models.PokemonCatch, err error)
 
 	Add(req *request.PokemonRequest) (res int64, err error)

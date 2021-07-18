@@ -27,6 +27,41 @@ func (uc PokemonUseCase) randomProbability() bool {
 	return rand.Float32() < 0.5
 }
 
+// Browse all data by ordering and sorting
+func (uc PokemonUseCase) Browse(search, orderBy, sort string, page, limit int) (res []view_models.PokemonVM, pagination view_models.PaginationVm, err error) {
+
+	// Initiate repository and view model
+	repository := query.NewPokemonRepository(uc.DB)
+	offset, limit, page, orderBy, sort := uc.SetPaginationParameter(page, limit, orderBy, sort)
+	vm := view_models.PokemonVM{}
+
+	// Query data from database
+	pokemons, err := repository.Browse(search, orderBy, sort, limit, offset)
+
+	// Handle response after query from database
+	if err != nil {
+		logruslogger.Log(logruslogger.WarnLevel, err.Error(), functioncaller.PrintFuncName(), "query-pokemon-browse")
+		return res, pagination, err
+	}
+
+	// Append data to view model
+	for _, pokemon := range pokemons {
+		res = append(res, vm.Build(pokemon))
+	}
+
+	//set pagination
+	totalCount, err := uc.Count(search)
+
+	// Handle response after query from database
+	if err != nil {
+		logruslogger.Log(logruslogger.WarnLevel, err.Error(), functioncaller.PrintFuncName(), "uc-pokemon-count")
+		return res, pagination, err
+	}
+	pagination = uc.SetPaginationResponse(page, limit, totalCount)
+
+	return res, pagination, nil
+}
+
 // Catch data by 0.5 probability
 func (uc PokemonUseCase) Catch(req *request.PokemonCatchRequest) (res view_models.PokemonCatch, err error) {
 	res = view_models.PokemonCatch{

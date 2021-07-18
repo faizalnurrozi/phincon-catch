@@ -88,6 +88,15 @@ func (model Pokemon) GetDelete() string {
 	return pokemonDeletedAtStatement
 }
 
+func (model *Pokemon) ScanRows(rows *sql.Rows) error {
+	err := rows.Scan(&model.id, &model.name, &model.pokemonID, &model.createdAt, &model.updatedAt, &model.deletedAt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (model *Pokemon) ScanRow(row *sql.Row) error {
 	err := row.Scan(&model.id, &model.name, &model.pokemonID, &model.createdAt, &model.updatedAt, &model.deletedAt)
 	if err != nil {
