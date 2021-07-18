@@ -16,7 +16,7 @@ func (boot Bootstrap) RegisterRoute() {
 	}
 
 	// Route for check health
-	rootParentGroup := boot.App.Group("/phincon-browse")
+	rootParentGroup := boot.App.Group("/phincon-catch")
 	rootParentGroup.Get("", func(ctx *fiber.Ctx) error {
 		return ctx.Status(200).JSON("Work")
 	})
